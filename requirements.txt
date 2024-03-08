@@ -1,0 +1,42 @@
+# Requeriments librarys
+
+
+# Data libraries
+pandas==2.2.0           # https://pandas.pydata.org/
+dlt==0.4.4                  # https://dlthub.com/docs/intro
+
+# parquet
+pyarrow==14.0.1
+
+
+# Enviromental Variables.
+python-dotenv==0.21.1
+
+
+
+#Libraries AWS
+boto3==1.28.83
+
+
+#Libraries GCP
+
+
+
+#Libraries AZURE
+
+
+#pre-commit
+pre-commit==3.6.1   # 1. pip install pre-commit. 2. pre-commit install  3. pre-commit sample-config > .pre-commit-config.yam <to replace .pre-commit.yam>
+ggshield==1.24.0    #  ggshield auth login
+
+#pytest
+pytest==8.0.0
+
+#pylint
+pylint==3.0.3
+
+#black - Library for formating.
+black==24.2.0
+
+#isort - Library for organizing imports
+isort==5.13.2
