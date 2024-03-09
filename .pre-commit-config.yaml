@@ -36,6 +36,11 @@ repos:
       args: [
         "tests/"
       ]
+- repo: https://github.com/pycqa/isort
+  rev: 5.13.2
+  hooks:
+    - id: isort
+      name: isort (python)
 
 - repo: https://github.com/gitguardian/ggshield
   rev: v1.24.0
