@@ -1,8 +1,10 @@
-# %%
-# %%
 import io
 import os
+import time
 
+import dlt
+
+# import duckdb
 import pandas as pd
 from dotenv import dotenv_values
 
@@ -32,20 +34,49 @@ googledriveObject = googledrive.GoogleDriveAPI(
 resultCsvList = googledriveObject.list_files()
 # Function to authenticate with Google Drive
 
+
+# %%
+def df_pipeline(
+    df: pd.DataFrame,
+) -> iter:
+    """
+    Generate dictionaries from DataFrame rows.
+
+    Parameters:
+        df (pd.DataFrame): Input DataFrame to iterate over.
+
+    Yields:
+        dict: A dictionary representing each row of the DataFrame.
+    """
+    # Iterate over rows in the DataFrame
+    for index_df, row in df.iterrows():
+        time.sleep(0.5)
+        print(f"Insert row{index_df}", row.to_dict())
+        yield row.to_dict()
+
+
 # %%
 # File ID from Google Drive
 dfs = []
-for index, result in enumerate(resultCsvList):
+
+pipeline = dlt.pipeline(destination="duckdb", dataset_name="people")
+
+for index, result in enumerate(resultCsvList[0:6]):
     file_id = result["id"]
     csv_file = googledriveObject.download_file(file_id=file_id)
 
     print(file_id)
-    progress = 0
     for chunk in csv_file:
         chunk_str = chunk.decode('utf-8')
         df_chunk = pd.read_csv(io.StringIO(chunk_str))
         print(df_chunk)
         print("------")
-        dfs.append(df_chunk)
-    # Concatenate all DataFrame chunks into a single DataFrame
-    df = pd.concat(dfs, ignore_index=True)
+        dfs.append(len(df_chunk))
+        info = pipeline.run(
+            df_pipeline(
+                df_chunk,
+            ),
+            table_name="fact_tablex",
+            write_disposition="merge",
+            primary_key=("user_id", "timestamp"),
+        )
