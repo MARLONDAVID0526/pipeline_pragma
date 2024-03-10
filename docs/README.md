@@ -56,6 +56,12 @@ elementos:
 
 # Solución propuesta
 
+## Diagramas de la solución
+**Diagrama de flujo de datos**
+![alt text](./image/step_diagram.png)
+
+![alt text](./image/diagrama_infraestructure.png)
+
 ## Estructura del Proyecto GitHub
 ```css
 ├── Dockerfile
@@ -115,7 +121,7 @@ La estructura de archivos proporcionada para este proyecto cumple con estándare
 
 -  requirements.txt: Este archivo lista todas las dependencias de Python necesarias para ejecutar la aplicación. Al mantener este archivo actualizado, facilita la replicación del entorno de desarrollo en diferentes máquinas y contribuye a la reproducibilidad del proyecto.
 
-- env: este archivo  podría contener configuraciones específicas del entorno, como variables de entorno o archivos de configuración sensibles. Es importante mantener esta información fuera del repositorio para evitar exponer datos sensibles, siguiendo buenas prácticas de seguridad.
+- env: este archivo  contiene configuraciones específicas del entorno, como variables de entorno o archivos de configuración sensibles. Es importante mantener esta información fuera del repositorio para evitar exponer datos sensibles, siguiendo buenas prácticas de seguridad.
 
 - .gitignore: El archivo .gitignore es utilizado por Git para especificar qué archivos y directorios deben ser ignorados en el control de versiones. Su propósito es mantener limpio el historial de cambios del repositorio, evitando la inclusión de archivos generados automáticamente, archivos de configuración locales y datos sensibles. Se especifican patrones de nombres de archivos o directorios que se deben ignorar, lo que ayuda a mantener el repositorio ordenado y seguro
 
@@ -158,6 +164,7 @@ Aquí, main.py contiene el código principal del pipeline de datos, mientras que
     Método upload_file: Este método sube un archivo a una carpeta en Google Drive.
 
 **main.py**
+
     Carga de Variables de Entorno: El archivo comienza cargando las variables de entorno necesarias para la ejecución del pipeline desde un archivo .env.
 
     Inicialización del objeto GoogleDriveAPI: Se inicializa un objeto GoogleDriveAPI utilizando la clase definida en googledrive.py. Este objeto se utilizará para interactuar con la API de Google Drive.
@@ -185,13 +192,93 @@ https://drive.google.com/drive/folders/1HW6e5DgRqjpJGbSvBC1KvX62JVW-WAII?usp=sha
 
 - Destino de Archivos Procesados: Después de procesar los archivos, los resultados se dejan en otra carpeta en Google Drive. Puedes encontrar esta carpeta en el siguiente enlace: Carpeta Compartida de Salida. Los archivos procesados se colocarán aquí para que el usuario pueda acceder a ellos.
 
-- Contenerización y Despliegue en la Nube: La solución es diseñada para ser contenerizada y desplegada en la nube. Puedes utilizar tecnologías como Docker para contenerizar la aplicación. Además, puedes orquestar y automatizar el flujo de trabajo utilizando herramientas como Apache Airflow, Prefect o Kubernetes. Esto permite una gestión eficiente de los recursos en la nube y una ejecución escalable de la solución.
+- Contenerización y Despliegue en la Nube: La solución es diseñada para ser contenerizada y desplegada en la nube. Puedes utilizar tecnologías como Docker para contenerizar la aplicación. Además, puedes orquestar y automatizar el flujo de trabajo utilizando herramientas como Apache Airflow, Prefect Mage entr otros. Esto permite una gestión eficiente de los recursos en la nube y una ejecución escalable de la solución.
 
 - La solución respeta los principios ACID (Atomicidad, Consistencia, Aislamiento y Durabilidad) en la base de datos, garantizando la integridad y la consistencia de los datos en todo momento. Esto significa que:
 
-- La solución crea y mantiene control de versiones de las tablas generadas durante la primera ejecución del sistema.
+- La solución crea y mantiene control de versiones de las tablas generadas usadas pydantic durante la primera ejecución del sistema.
+
+- Se creo una tabla adicional de usuarios, que contiene los datos de usuarios (user).
 
 - Está conectada a una base de datos PostgreSQL en Google Cloud Platform (GCP). Sin embargo, cabe destacar que se podría haber optado por cualquier otro servicio de base de datos. La elección de PostgreSQL en GCP se debió a la disponibilidad de cuentas al momento de desarrollar la actividad.
+
+### Diccionario de datos:
+Este proyecto utiliza una base de datos PostgreSQL para almacenar datos. El esquema "chess_data" contiene las tablas principales que registran la carga de datos, el estado del pipeline, estadísticas y detalles de los usuarios. Por otro lado, el esquema "chess_data_staging" almacena datos de carga temporal y versiones del esquema.
+
+El diccionario de datos proporcionado describe cada tabla en detalle, incluyendo los nombres de las columnas, los tipos de datos y las restricciones de clave única. Esta información es útil para desarrolladores y analistas que trabajan con la base de datos, ya que les permite comprender la estructura y organización de los datos almacenados.
+
+#### Tablas del Esquema "chess_data"
+
+##### `_dlt_loads`
+- `load_id`: VARCHAR (No Nulo)
+- `schema_name`: VARCHAR
+- `status`: BIGINT (No Nulo)
+- `inserted_at`: TIMESTAMP con zona horaria (No Nulo)
+- `schema_version_hash`: VARCHAR
+
+##### `_dlt_pipeline_state`
+- `version`: BIGINT (No Nulo)
+- `engine_version`: BIGINT (No Nulo)
+- `pipeline_name`: VARCHAR (No Nulo)
+- `state`: VARCHAR (No Nulo)
+- `created_at`: TIMESTAMP con zona horaria (No Nulo)
+- `version_hash`: VARCHAR
+- `_dlt_load_id`: VARCHAR (No Nulo)
+- `_dlt_id`: VARCHAR (No Nulo, Clave Única)
+
+##### `_dlt_version`
+- `version`: BIGINT (No Nulo)
+- `engine_version`: BIGINT (No Nulo)
+- `inserted_at`: TIMESTAMP con zona horaria (No Nulo)
+- `schema_name`: VARCHAR (No Nulo)
+- `version_hash`: VARCHAR (No Nulo)
+- `schema`: VARCHAR (No Nulo)
+
+##### `generic_fact_table`
+- `user_id`: BIGINT (No Nulo)
+- `timestamp`: DATE (No Nulo)
+- `price`: BIGINT
+- `file_name`: VARCHAR
+- `batch_row_number`: BIGINT
+- `_dlt_load_id`: VARCHAR (No Nulo)
+- `_dlt_id`: VARCHAR (No Nulo, Clave Única)
+
+##### `statistics`
+- `count`: BIGINT
+- `price_mean`: DOUBLE PRECISION
+- `price_min`: BIGINT
+- `price_max`: BIGINT
+- `file_name`: VARCHAR
+- `_dlt_load_id`: VARCHAR (No Nulo)
+- `_dlt_id`: VARCHAR (No Nulo, Clave Única)
+
+##### `user`
+- `id`: BIGINT (No Nulo)
+- `name`: VARCHAR (No Nulo)
+- `created_at`: TIMESTAMP con zona horaria (No Nulo)
+- `_dlt_load_id`: VARCHAR (No Nulo)
+- `_dlt_id`: VARCHAR (No Nulo, Clave Única)
+
+### Tablas del Esquema "chess_data_staging"
+
+##### `_dlt_version`
+- `version`: BIGINT (No Nulo)
+- `engine_version`: BIGINT (No Nulo)
+- `inserted_at`: TIMESTAMP con zona horaria (No Nulo)
+- `schema_name`: VARCHAR (No Nulo)
+- `version_hash`: VARCHAR (No Nulo)
+- `schema`: VARCHAR (No Nulo)
+
+##### `generic_fact_table`
+- `user_id`: BIGINT (No Nulo)
+- `timestamp`: DATE (No Nulo)
+- `price`: BIGINT
+- `file_name`: VARCHAR
+- `batch_row_number`: BIGINT
+- `_dlt_load_id`: VARCHAR (No Nulo)
+- `_dlt_id`: VARCHAR (No Nulo, Clave Única)
+
+
 
 ### Comprobación de Resultados::
 
@@ -205,7 +292,7 @@ https://drive.google.com/drive/folders/1HW6e5DgRqjpJGbSvBC1KvX62JVW-WAII?usp=sha
 	22	    59.650000	14.0	97.0	2012-1.csv
     ```
     Estas son las estadisticas para la ejecución de los cinco archivos archivos desde python. Adjunto imagen:
-    ![alt text](image.png)
+    ![alt text](./image/statistics.png)
     Se destaca que cada archivo se sube de manera independiente y no al mismo tiempo, este solo es un consolidado.
 
 * Consultas a la Base de Datos: Ejecuta consultas a la base de datos para obtener:
@@ -233,12 +320,12 @@ https://drive.google.com/drive/folders/1HW6e5DgRqjpJGbSvBC1KvX62JVW-WAII?usp=sha
 
     ```sql
     #Respuesta usando pgadmin en tabla de hechos (chess_data.generic_fact_table).
-    "avg"	            "min"	"max"	"file_name"
-    59.6500000000000000	14	    97	    "2012-1.csv"
-    54.8275862068965517	10	    100	    "2012-2.csv"
-    58.2580645161290323	13	    100	    "2012-5.csv"
-    57.3928571428571429	10	    97	    "2012-4.csv"
-    59.6774193548387097	12	    99	    "2012-3.csv"
+    "avg"	                "min"	"max"	"file_name"
+    59.6500000000000000	    14	    97	    "2012-1.csv"
+    54.8275862068965517	    10	    100	    "2012-2.csv"
+    58.2580645161290323	    13	    100	    "2012-5.csv"
+    57.3928571428571429	    10	    97	    "2012-4.csv"
+    59.6774193548387097	    12	    99	    "2012-3.csv"
     ```
     Se guardan estaditicas en tabla de estadisticas dentro de la misma bd, por batch:
     ```sql
@@ -280,4 +367,11 @@ https://drive.google.com/drive/folders/1HW6e5DgRqjpJGbSvBC1KvX62JVW-WAII?usp=sha
     29	    54.827586206896555	10	    100	        "2012-2.csv"
     22	    59.65	            14	    97	        "2012-1.csv"
     8       41.75               11      92          "validation.csv"
-    ```
+```
+
+
+
+## Puntos de mejora
+1. La solución también integra un proceso de orquestación, aprovechando herramientas como Airflow, Mage o Prefect. Estas plataformas permiten gestionar y coordinar de manera eficiente las distintas etapas del flujo de trabajo, desde la extracción y transformación de datos hasta su carga y monitoreo.
+
+2. En lugar de simplemente cargar la información en una base de datos, la solución ofrece la flexibilidad de almacenar los datos en formatos Parquet con particionado de datos. Esta técnica proporciona una estructura optimizada para análisis y consulta, mejorando la eficiencia y el rendimiento de las operaciones de lectura y escritura, además de permitir una gestión más eficiente de los conjuntos de datos.

@@ -32,6 +32,7 @@ print(
     serviceAccountPath,
 )
 
+
 # pylint: : disable=R0914
 # pylint: : disable=R0915
 def main():
