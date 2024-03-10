@@ -6,6 +6,7 @@ import os
 from dotenv import dotenv_values
 
 # Loading local packages
+# pylint: disable=E0401
 from modules.apis.google_drive import googledrive
 
 env_variables = dotenv_values(".env")
@@ -17,7 +18,7 @@ googleDriveFolderId = os.getenv(
 )
 googleDriveFolderIdProccessed = os.getenv("folderGoogleDriveProcessed")
 
-serviceAccountPath = "../googlecredentials.json"
+serviceAccountPath = os.getenv("serviceAccountJsonKeyPath")
 gDFolderUrl = os.getenv("gDFolderUrl")
 
 googledriveObject = googledrive.GoogleDriveAPI(
