@@ -12,6 +12,8 @@ from pydantic import BaseModel
 # Loading local packages
 from modules.apis.google_drive import googledrive
 
+# Load environment variables
+# def main():
 # Loading environment variables
 env_variables = dotenv_values(".env")
 googleDriveUrl = os.getenv("folderUrl")
@@ -28,7 +30,10 @@ host = os.getenv("host")  # or the IP address location of your database
 port = os.getenv("port")
 connect_timeout = os.getenv("connect_timeout")
 
-print("connect_timeout", connect_timeout)
+print(
+    "serviceAccountPath",
+    serviceAccountPath,
+)
 
 # Initialize Google Drive API object
 googledriveObject = googledrive.GoogleDriveAPI(
@@ -187,3 +192,8 @@ for index, result in enumerate(resultCsvList):
     move_file = googledriveObject.copy_and_delete_file(
         file_id=file_id, destination_folder_id=googleDriveFolderIdProccessed
     )
+
+"""
+if __name__ == "__main__":
+    main()
+"""
