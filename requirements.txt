@@ -4,6 +4,7 @@
 # Data libraries
 pandas==2.2.0           # https://pandas.pydata.org/
 dlt==0.4.4                  # https://dlthub.com/docs/intro
+pydantic==2.6.3
 
 # parquet
 pyarrow==14.0.1
