@@ -157,7 +157,7 @@ Aquí, main.py contiene el código principal del pipeline de datos, mientras que
 
     Método upload_file: Este método sube un archivo a una carpeta en Google Drive.
 
-**googledrmain.py**
+**main.py**
     Carga de Variables de Entorno: El archivo comienza cargando las variables de entorno necesarias para la ejecución del pipeline desde un archivo .env.
 
     Inicialización del objeto GoogleDriveAPI: Se inicializa un objeto GoogleDriveAPI utilizando la clase definida en googledrive.py. Este objeto se utilizará para interactuar con la API de Google Drive.
@@ -173,3 +173,111 @@ Aquí, main.py contiene el código principal del pipeline de datos, mientras que
     Almacenamiento de estadísticas: Las estadísticas calculadas se almacenan en una tabla de la base de datos utilizando un segundo pipeline de datos.
 
     Movimiento del archivo procesado: Una vez que el archivo CSV ha sido procesado, se copia a otra carpeta dentro de Google Drive y se elimina el archivo original.
+
+
+## Precisiones sobre la solución:
+
+- Punto de Entrada para Descarga de Archivos: Los archivos CSV con la estructura correcta se deben depositar en la carpeta compartida en Google Drive en el siguiente enlace: Carpeta Compartida de Entrada. Esta carpeta actúa como la puerta de entrada para que el usuario deposite los archivos que serán procesados.
+    https://drive.google.com/drive/folders/1Igp_dLYVV29bJRMIJyQoRdcnI82PH1eK?usp=sharing
+
+- Uso de la Biblioteca Python dlt: Se utiliza la biblioteca Python dlt para realizar ciertas operaciones en el código. dlt es una biblioteca que proporciona funcionalidades para la manipulación de datos, como la descarga y carga de archivos desde y hacia multiples sitios, de una manera, rapida, eficiente y liviana, entre otras utilidades.
+https://drive.google.com/drive/folders/1HW6e5DgRqjpJGbSvBC1KvX62JVW-WAII?usp=sharing
+
+- Destino de Archivos Procesados: Después de procesar los archivos, los resultados se dejan en otra carpeta en Google Drive. Puedes encontrar esta carpeta en el siguiente enlace: Carpeta Compartida de Salida. Los archivos procesados se colocarán aquí para que el usuario pueda acceder a ellos.
+
+- Contenerización y Despliegue en la Nube: La solución es diseñada para ser contenerizada y desplegada en la nube. Puedes utilizar tecnologías como Docker para contenerizar la aplicación. Además, puedes orquestar y automatizar el flujo de trabajo utilizando herramientas como Apache Airflow, Prefect o Kubernetes. Esto permite una gestión eficiente de los recursos en la nube y una ejecución escalable de la solución.
+
+- La solución respeta los principios ACID (Atomicidad, Consistencia, Aislamiento y Durabilidad) en la base de datos, garantizando la integridad y la consistencia de los datos en todo momento. Esto significa que:
+
+- La solución crea y mantiene control de versiones de las tablas generadas durante la primera ejecución del sistema.
+
+- Está conectada a una base de datos PostgreSQL en Google Cloud Platform (GCP). Sin embargo, cabe destacar que se podría haber optado por cualquier otro servicio de base de datos. La elección de PostgreSQL en GCP se debió a la disponibilidad de cuentas al momento de desarrollar la actividad.
+
+### Comprobación de Resultados::
+
+* Impresión de Estadísticas: Imprime el valor actual de las estadísticas durante la ejecución del pipeline para monitorear el progreso.
+    ```python
+    count	price_mean	price_min	price_max	file_name
+	31	    58.258065	13.0	100.0	2012-5.csv
+	30	    57.392857	10.0	97.0	2012-4.csv
+	31	    59.677419	12.0	99.0	2012-3.csv
+	29	    54.827586	10.0	100.0	2012-2.csv
+	22	    59.650000	14.0	97.0	2012-1.csv
+    ```
+    Estas son las estadisticas para la ejecución de los cinco archivos archivos desde python. Adjunto imagen:
+    ![alt text](image.png)
+    Se destaca que cada archivo se sube de manera independiente y no al mismo tiempo, este solo es un consolidado.
+
+* Consultas a la Base de Datos: Ejecuta consultas a la base de datos para obtener:
+
+    * Recuento total de filas cargadas.
+    ```sql
+    SELECT COUNT(*) AS total_count,file_name   FROM chess_data.generic_fact_table
+    GROUP BY _dlt_load_id, file_name
+    ```
+    ```sql
+    #Respuesta usando pgadmin
+    total_count file_name
+        22	    "2012-1.csv"
+        29	    "2012-2.csv"
+        31	    "2012-5.csv"
+        30	    "2012-4.csv"
+        31	    "2012-3.csv"
+    ```
+
+    * Valor promedio, mínimo y máximo del campo "price":
+    ```sql
+    SELECT AVG(price), MIN(price), MAX(price), file_name FROM chess_data.generic_fact_table
+    GROUP BY _dlt_load_id, file_name
+    ```
+
+    ```sql
+    #Respuesta usando pgadmin en tabla de hechos (chess_data.generic_fact_table).
+    "avg"	            "min"	"max"	"file_name"
+    59.6500000000000000	14	    97	    "2012-1.csv"
+    54.8275862068965517	10	    100	    "2012-2.csv"
+    58.2580645161290323	13	    100	    "2012-5.csv"
+    57.3928571428571429	10	    97	    "2012-4.csv"
+    59.6774193548387097	12	    99	    "2012-3.csv"
+    ```
+    Se guardan estaditicas en tabla de estadisticas dentro de la misma bd, por batch:
+    ```sql
+    SELECT * FROM chess_data.statistics;
+    #Respuesta de tabla de estadisticas dentro de la bd
+    "count"	"price_mean"	"price_min"	"price_max"	"file_name"
+    31	    58.25806451612903	13	    100	        "2012-5.csv"
+    30	    57.392857142857146	10	    97	        "2012-4.csv"
+    31	    59.67741935483871	12	    99	        "2012-3.csv"
+    29	    54.827586206896555	10	    100	        "2012-2.csv"
+    22	    59.65	            14	    97	        "2012-1.csv"
+    ```
+
+* Validación: Ejecuta el archivo "validation.csv" a través del pipeline y muestra el valor actualizado de las estadísticas.
+    ```python
+    count	price_mean	price_min	price_max	file_name
+	8       41.75         11         92         validation.csv
+    ```
+
+* Consultas Adicionales: Realiza consultas a la base de datos nuevamente después de cargar "validation.csv" para verificar cómo cambian las estadísticas.
+```sql
+    #Respuesta usando pgadmin en tabla de hechos luego de la carga de datos de validacion.csv (chess_data.generic_fact_table).
+    "avg"	            "min"	"max"	"file_name"
+    59.6500000000000000	14	    97	    "2012-1.csv"
+    54.8275862068965517	10	    100	    "2012-2.csv"
+    58.2580645161290323	13	    100	    "2012-5.csv"
+    57.3928571428571429	10	    97	    "2012-4.csv"
+    59.6774193548387097	12	    99	    "2012-3.csv"
+    41.7500000000000000 11      92      "validation.csv"
+    ```
+    Se guardan estaditicas en tabla de estadisticas dentro de la misma bd, por batch:
+    ```sql
+    SELECT * FROM chess_data.statistics;
+    #Respuesta de tabla de estadisticas dentro de la bd
+    "count"	"price_mean"	"price_min"	"price_max"	"file_name"
+    31	    58.25806451612903	13	    100	        "2012-5.csv"
+    30	    57.392857142857146	10	    97	        "2012-4.csv"
+    31	    59.67741935483871	12	    99	        "2012-3.csv"
+    29	    54.827586206896555	10	    100	        "2012-2.csv"
+    22	    59.65	            14	    97	        "2012-1.csv"
+    8       41.75               11      92          "validation.csv"
+    ```

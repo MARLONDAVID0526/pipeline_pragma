@@ -131,6 +131,8 @@ def main():
     converting timestamps, executing data pipelines for database integration,
     computing basic statistics, and managing file archiving.
     """
+    local_Statistics = []
+
     for index, result in enumerate(resultCsvList):
         file_id = result["id"]
         csv_file = googledriveObject.download_file(file_id=file_id)
@@ -165,6 +167,7 @@ def main():
         file_name = result["name"]
 
         # Create statistics and send to a table calle statistics
+
         data = [
             {
                 "count": count,
@@ -186,6 +189,15 @@ def main():
         move_file = googledriveObject.copy_and_delete_file(
             file_id=file_id, destination_folder_id=googleDriveFolderIdProccessed
         )
+
+        local_Statistics.append(data)
+
+    flat_statistics = [item for sublist in local_Statistics for item in sublist]
+    df_statistics = pd.DataFrame(flat_statistics)
+
+    # Mostrar el DataFrame
+    print("Estadísticas:")
+    print(df_statistics)
 
 
 if __name__ == "__main__":
