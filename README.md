@@ -57,56 +57,56 @@ elementos:
 # Solución propuesta
 
 ## Estructura del Proyecto GitHub
-
-├── Dockerfile\
-├── LICENSE\
-├── LICENSE copy\
-├── Makefile\
-├── README copy.md\
-├── README.md\
-├── docs\
-│   ├── index.md\
-│   └── tutorial.md\
-├── pyproject.toml\
-├── requirements.txt\
-├── scripts\
-│   ├── postgres.sql\
-│   └── publish.sh\
-├── setup.py\
-├── src\
-│   ├── main.py\
-│   ├── modules\
-│   │   ├── apis\
-│   │   │   ├── __init__.py\
-│   │   │   ├── amazon_api\
-│   │   │   ├── clockify\
-│   │   │   └── google_drive\
-│   │   │       ├── __init__.py\
-│   │   │       └── googledrive.py\
-│   │   └── clouds\
-│   │       ├── aws\
-│   │       │   └── __init__.py\
-│   │       ├── azure\
-│   │       │   └── __init__.py\
-│   │       └── gcp\
-│   │           └── __init__.py\
-│   └── support_gcp.py\
-└── tests\
-    ├── dataset_testing\
-    │   ├── 2012-1.csv\
-    │   ├── 2012-2.csv\
-    │   ├── 2012-3.csv\
-    │   ├── 2012-4.csv\
-    │   ├── 2012-5.csv\
-    │   └── validation.csv\
-    ├── integration\
-    │   ├── docker-compose.yaml\
-    │   ├── model\
-    │   ├── run.sh\
-    │   └── test_docker.py\
-    └── unit\
+```css
+├── Dockerfile
+├── LICENSE
+├── LICENSE copy
+├── Makefile
+├── README copy.md
+├── README.md
+├── docs
+│   ├── index.md
+│   └── tutorial.md
+├── pyproject.toml
+├── requirements.txt
+├── scripts
+│   ├── postgres.sql
+│   └── publish.sh
+├── setup.py
+├── src
+│   ├── main.py
+│   ├── modules
+│   │   ├── apis
+│   │   │   ├── __init__.py
+│   │   │   ├── amazon_api
+│   │   │   ├── clockify
+│   │   │   └── google_drive
+│   │   │       ├── __init__.py
+│   │   │       └── googledrive.py
+│   │   └── clouds
+│   │       ├── aws
+│   │       │   └── __init__.py
+│   │       ├── azure
+│   │       │   └── __init__.py
+│   │       └── gcp
+│   │           └── __init__.py
+│   └── support_gcp.py
+└── tests
+    ├── dataset_testing
+    │   ├── 2012-1.csv
+    │   ├── 2012-2.csv
+    │   ├── 2012-3.csv
+    │   ├── 2012-4.csv
+    │   ├── 2012-5.csv
+    │   └── validation.csv
+    ├── integration
+    │   ├── docker-compose.yaml
+    │   ├── model
+    │   ├── run.sh
+    │   └── test_docker.py
+    └── unit
         └── test_main.py
-
+```
 La estructura de archivos proporcionada para este proyecto cumple con estándares de seguridad y buenas prácticas de desarrollo. Aquí hay una breve descripción destacando algunos aspectos importantes:
 
 - src/main.py: Este archivo contiene el punto de entrada principal de la aplicación. Aquí es donde se inicializan y se ejecutan los diferentes componentes del pipeline de datos.
@@ -115,7 +115,9 @@ La estructura de archivos proporcionada para este proyecto cumple con estándare
 
 -  requirements.txt: Este archivo lista todas las dependencias de Python necesarias para ejecutar la aplicación. Al mantener este archivo actualizado, facilita la replicación del entorno de desarrollo en diferentes máquinas y contribuye a la reproducibilidad del proyecto.
 
-- env: Esta carpeta podría contener configuraciones específicas del entorno, como variables de entorno o archivos de configuración sensibles. Es importante mantener esta información fuera del repositorio para evitar exponer datos sensibles, siguiendo buenas prácticas de seguridad.
+- env: este archivo  podría contener configuraciones específicas del entorno, como variables de entorno o archivos de configuración sensibles. Es importante mantener esta información fuera del repositorio para evitar exponer datos sensibles, siguiendo buenas prácticas de seguridad.
+
+- .gitignore: El archivo .gitignore es utilizado por Git para especificar qué archivos y directorios deben ser ignorados en el control de versiones. Su propósito es mantener limpio el historial de cambios del repositorio, evitando la inclusión de archivos generados automáticamente, archivos de configuración locales y datos sensibles. Se especifican patrones de nombres de archivos o directorios que se deben ignorar, lo que ayuda a mantener el repositorio ordenado y seguro
 
 -  pre-commit hooks: Se han incluido ganchos pre-commit para evitar la inclusión de datos sensibles en GitHub utilizando ggshield, una herramienta que escanea los cambios antes de realizar un commit para buscar información confidencial. Esto ayuda a proteger la seguridad y privacidad de los datos del proyecto.
 
@@ -124,3 +126,50 @@ La estructura de archivos proporcionada para este proyecto cumple con estándare
 * Pruebas unitarias: Se incluyen algunas unitarias para garantizar que todas las funciones y componentes del pipeline de datos funcionen correctamente. Estas pruebas ayudan a identificar posibles errores o regresiones durante el desarrollo y a mantener la integridad del código a medida que se realizan modificaciones. Las pruebas unitarias también ayudan a controlar los cambios en el código y a garantizar que nuevas funcionalidades no introduzcan problemas inesperados.
 
 -  En resumen, la estructura del proyecto y las prácticas implementadas contribuyen a la seguridad, el mantenimiento y la colaboración efectiva entre los miembros del equipo.
+
+
+## Explicación del Código paso a Paso:
+La solución del código se encuentra en la carpeta src, donde se alojan los archivos main.py y modules. Esto significa que la estructura de archivos se organiza de la siguiente manera:
+```css
+└── src
+    ├── main.py
+    ├── modules
+    │   └── apis
+    │       └── googledrive.py
+```
+
+Aquí, main.py contiene el código principal del pipeline de datos, mientras que googledrive.py dentro de la carpeta modules/apis proporciona la clase GoogleDriveAPI, que interactúa con la API de Google Drive. Esta estructura modular permite una mejor organización del código y facilita su mantenimiento y reutilización.
+
+
+**googledrive.py**
+
+    Inicialización de la clase GoogleDriveAPI: La clase GoogleDriveAPI se inicializa con la ruta al archivo de credenciales de servicio y el ID de la carpeta de Google Drive con la que se va a interactuar.
+
+    Método list_files: Este método lista los archivos en una carpeta especificada dentro de Google Drive.
+
+    Método download_file: Este método descarga un archivo de Google Drive y lo devuelve como un flujo de bytes.
+
+    Método copy_and_delete_file: Este método copia un archivo a otra carpeta en Google Drive y luego elimina el archivo original.
+
+    Método create_folder: Este método crea una nueva carpeta en Google Drive.
+
+    Método share_folder_with_user: Este método comparte una carpeta en Google Drive con un usuario específico.
+
+    Método upload_file: Este método sube un archivo a una carpeta en Google Drive.
+
+**googledrmain.py**
+    Carga de Variables de Entorno: El archivo comienza cargando las variables de entorno necesarias para la ejecución del pipeline desde un archivo .env.
+
+    Inicialización del objeto GoogleDriveAPI: Se inicializa un objeto GoogleDriveAPI utilizando la clase definida en googledrive.py. Este objeto se utilizará para interactuar con la API de Google Drive.
+
+    Obtención de la lista de id's archivos CSV: Se obtiene una lista de archivos CSV presentes en una carpeta específica de Google Drive utilizando el método list_files del objeto GoogleDriveAPI.
+
+    Iteración sobre los archivos CSV: Se itera sobre cada archivo CSV obtenido en el paso anterior de manera independiente.
+
+    Descarga y procesamiento del archivo CSV: Se descarga el archivo CSV utilizando el método download_file del objeto GoogleDriveAPI. Luego, se procesa el archivo CSV, convirtiendo las fechas y ejecutando un pipeline de datos para su carga en una base de datos por cada fila del csv cargado.
+
+    Cálculo de estadísticas: Se calculan estadísticas básicas sobre el archivo CSV, de manera individual y completa del batch, como el número total de filas, el precio medio, mínimo y máximo.
+
+    Almacenamiento de estadísticas: Las estadísticas calculadas se almacenan en una tabla de la base de datos utilizando un segundo pipeline de datos.
+
+    Movimiento del archivo procesado: Una vez que el archivo CSV ha sido procesado, se copia a otra carpeta dentro de Google Drive y se elimina el archivo original.
