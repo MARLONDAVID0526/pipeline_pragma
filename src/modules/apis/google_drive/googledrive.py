@@ -86,10 +86,10 @@ class GoogleDriveAPI:
             .execute()
         )
         copied_file_id = copied_file.get('id')
-        body_value = {'trashed': True}
+        # body_value = {'trashed': True}
         # Delete the original file
         # pylint: disable=E1101
-        self.service.files().update(fileId=file_id, body=body_value).execute()
+        self.service.files().delete(fileId=file_id).execute()
         return copied_file_id
 
     def create_folder(self, folder_name: str, parent_folder_id: str = None):

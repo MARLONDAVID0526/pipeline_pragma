@@ -32,9 +32,7 @@ path_list = [
     "../tests/dataset_testing/2012-5.csv",
     "../tests/dataset_testing/validation.csv",
 ]
-path_list = [
-    "../tests/dataset_testing/validation.csv",
-]
+
 for path_ in path_list:
     upload = googledriveObject.upload_file(
         file_path=path_, folder_id="1Igp_dLYVV29bJRMIJyQoRdcnI82PH1eK"
