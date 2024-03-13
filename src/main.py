@@ -6,31 +6,30 @@ from datetime import date, datetime
 
 import dlt
 import pandas as pd
-from dotenv import dotenv_values
+from dotenv import load_dotenv  # , dotenv_values
 from pydantic import BaseModel
 
 # Loading local packages
 from modules.apis.google_drive import googledrive
 
 # Load environment variables
-env_variables = dotenv_values(".env")
-googleDriveUrl = os.getenv("folderUrl")
-googleDriveFolderId = os.getenv("folderGoogleDrive")
-googleDriveFolderIdProccessed = os.getenv("folderGoogleDriveProcessed")
-serviceAccountPath = os.getenv("serviceAccountJsonKeyPath")
-gDFolderUrl = os.getenv("gDFolderUrl")
+# env_variables = dotenv_values(".env"[
+load_dotenv(override=True, dotenv_path=".env")
+
+googleDriveUrl = os.environ["gDFolderUrl"]
+googleDriveFolderId = os.environ["folderGoogleDrive"]
+googleDriveFolderIdProccessed = os.environ["folderGoogleDriveProcessed"]
+serviceAccountPath = os.environ["serviceAccountJsonKeyPath"]
+gDFolderUrl = os.environ["gDFolderUrl"]
 
 # Database configuration
-database = os.getenv("database")
-username = os.getenv("username")
-password = os.getenv("password")  # replace with your password
-host = os.getenv("host")  # or the IP address location of your database
-port = os.getenv("port")
-connect_timeout = os.getenv("connect_timeout")
-print(
-    "serviceAccountPath",
-    serviceAccountPath,
-)
+database = os.environ["database"]
+username = os.environ["username"]
+password = os.environ["password"]  # replace with your password
+host = os.environ["host"]  # or the IP address location of your database
+port = os.environ["port"]
+connect_timeout = os.environ["connect_timeout"]
+print("serviceAccountPath", serviceAccountPath, "database", database, "host", host)
 
 
 # pylint: : disable=R0914
