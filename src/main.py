@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from modules.apis.google_drive import googledrive
 
 # Load environment variables
-# env_variables = dotenv_values(".env"[
+# env_variables = dotenv_values(".env")
 load_dotenv(override=True, dotenv_path=".env")
 
 googleDriveUrl = os.environ["gDFolderUrl"]
@@ -22,14 +22,14 @@ googleDriveFolderIdProccessed = os.environ["folderGoogleDriveProcessed"]
 serviceAccountPath = os.environ["serviceAccountJsonKeyPath"]
 gDFolderUrl = os.environ["gDFolderUrl"]
 
-# Database configuration
+# Database configurationst
 database = os.environ["database"]
 username = os.environ["username"]
 password = os.environ["password"]  # replace with your password
 host = os.environ["host"]  # or the IP address location of your database
 port = os.environ["port"]
 connect_timeout = os.environ["connect_timeout"]
-print("serviceAccountPath", serviceAccountPath, "database", database, "host", host)
+# print("serviceAccountPath", serviceAccountPath, "database", database, "host", host)
 
 
 # pylint: : disable=R0914
@@ -202,3 +202,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# %%

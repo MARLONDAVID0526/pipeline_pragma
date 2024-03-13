@@ -15,6 +15,7 @@ activate_conda_env:
 
 install_requeriments:
 	pip install -r requirements.txt
+	pip install "dlt[postgres]"
 
 setup:
 	pre-commit install
